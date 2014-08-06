@@ -6,8 +6,8 @@ import scala.concurrent.duration._
 import scala.collection.mutable
 import display.MandelbrotDisplay
 
-object MandelbrotWithActors extends App {
-  calculate(numWorkers = 1, numSegments = 10)
+object Mandelbrot extends App{
+  calculate(numWorkers = 4, numSegments = 10)
   
   sealed trait MandelbrotMessage
   case object Calculate extends MandelbrotMessage
@@ -25,13 +25,13 @@ object MandelbrotWithActors extends App {
     master ! Calculate
   }
 
-  class Master(nrOfWorkers: Int, numSegments: Int, resultHandler: ActorRef) extends Actor {
+  class Master(numWorkers: Int, numSegments: Int, resultHandler: ActorRef) extends Actor {
     var mandelbrot: mutable.Map[(Int, Int), Int] = mutable.Map()
     var numResults: Int = 0
     val start: Long = System.currentTimeMillis()
   
     val workerRouter = context.actorOf(
-        Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
+        Props[Worker].withRouter(RoundRobinPool(numWorkers)), name = "workerRouter")
     
     def receive = {
       case Calculate =>
