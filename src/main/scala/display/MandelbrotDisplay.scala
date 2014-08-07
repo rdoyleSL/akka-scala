@@ -12,11 +12,28 @@ class MandelbrotDisplay(points: mutable.Map[(Int, Int), Int], height: Int, width
   setVisible(true)
   override def paint(g: Graphics) {
     super.paint(g)
+    var histogram: Array[Int] = new Array[Int](1000)
     for(px <- 0 until width) {
       for (py <- 0 until height) {
         val numIters = points(px,py)
-        val colorVal = points((px, py)).toFloat/maxIterations
-        g.setColor(new Color(colorVal, colorVal, colorVal))
+        histogram(numIters-1) += 1
+      }
+    }
+    var total = 0
+    for(i <- 0 until maxIterations) {
+      total += histogram(i)
+    }
+
+    for(px <- 0 until width) {
+      for (py <- 0 until height) {
+        val numIters = points(px,py)
+
+        var colorVal = 0.0
+        for(i <- 0 until numIters) {
+          colorVal += histogram(i).toFloat / total.toFloat
+        }
+
+        g.setColor(new Color(colorVal.toFloat, colorVal.toFloat, colorVal.toFloat))
         g.drawLine(px, py, px, py)
       }
     }
