@@ -12,7 +12,7 @@ class MandelbrotDisplay(points: mutable.Map[(Int, Int), Int], height: Int, width
   setVisible(true)
   override def paint(g: Graphics) {
     super.paint(g)
-    var histogram: Array[Int] = new Array[Int](1000)
+    var histogram: Array[Int] = new Array[Int](maxIterations)
     for(px <- 0 until width) {
       for (py <- 0 until height) {
         val numIters = points(px,py)

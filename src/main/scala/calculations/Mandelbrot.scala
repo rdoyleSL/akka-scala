@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 import scala.collection.mutable
 import display.MandelbrotDisplay
 
-object Mandelbrot extends App{
+object Mandelbrot extends App {
   calculate(numWorkers = 4, numSegments = 10)
   
   sealed trait MandelbrotMessage
