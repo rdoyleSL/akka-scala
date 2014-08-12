@@ -33,7 +33,8 @@ class MandelbrotDisplay(points: mutable.Map[(Int, Int), Int], height: Int, width
           colorVal += histogram(i).toFloat / total.toFloat
         }
 
-        g.setColor(new Color(colorVal.toFloat, colorVal.toFloat, colorVal.toFloat))
+        val rgb = Color.HSBtoRGB(0.1f+colorVal.toFloat, 1.0f, colorVal.toFloat*colorVal.toFloat)
+        g.setColor(new Color(rgb))
         g.drawLine(px, py, px, py)
       }
     }
