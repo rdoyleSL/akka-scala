@@ -14,8 +14,9 @@ object Mandelbrot extends App {
   case class Work(start: Int, numYPixels: Int) extends MandelbrotMessage
   case class Result(elements: mutable.Map[(Int, Int), Int]) extends MandelbrotMessage
   case class MandelbrotResult(elements: mutable.Map[(Int, Int), Int], duration: Duration) extends MandelbrotMessage
-  val canvasWidth: Int = 1000
-  val canvasHeight: Int = 1000
+
+  val canvasWidth: Int = 1200
+  val canvasHeight: Int = 800
   val maxIterations: Int = 1000
   
   def calculate(numWorkers: Int, numSegments: Int) {
@@ -36,7 +37,9 @@ object Mandelbrot extends App {
     def receive = {
       case Calculate =>
         val pixelsPerSegment = canvasHeight/numSegments
-        for (i <- 0 until numSegments) workerRouter ! Work(i * pixelsPerSegment, pixelsPerSegment)
+        for (i <- 0 until numSegments)
+          workerRouter ! Work(i * pixelsPerSegment, pixelsPerSegment)
+
       case Result(elements) =>
         mandelbrot ++= elements
         numResults += 1
@@ -51,7 +54,9 @@ object Mandelbrot extends App {
   class Worker extends Actor {
     def calculateMandelbrotFor(start: Int, numYPixels: Int): mutable.Map[(Int, Int), Int] = {
       var mandelbrot: mutable.Map[(Int, Int), Int] = mutable.Map()
+
       for (px <- 0 until canvasWidth) {
+
         for (py <- start until start + numYPixels) {
           // Convert the pixels to x, y co-ordinates in
           // the range x = (-2.5, 1.0), y = (-1.0, 1.0)
