@@ -1,12 +1,12 @@
-package calculations
+package org.bohdi.mandelbrot
 
 import akka.actor._
 import akka.routing.RoundRobinPool
-import scala.concurrent.duration._
-import scala.collection.mutable
-import display.MandelbrotDisplay
 
-object Mandelbrot extends App {
+import scala.collection.mutable
+import scala.concurrent.duration._
+
+object Server extends App {
   calculate(numWorkers = 4, numSegments = 10)
   
   sealed trait MandelbrotMessage
@@ -15,9 +15,9 @@ object Mandelbrot extends App {
   case class Result(elements: mutable.Map[(Int, Int), Int]) extends MandelbrotMessage
   case class MandelbrotResult(elements: mutable.Map[(Int, Int), Int], duration: Duration) extends MandelbrotMessage
 
-  val canvasWidth: Int = 1200
+  val canvasWidth: Int = 1000
   val canvasHeight: Int = 800
-  val maxIterations: Int = 1000
+  val maxIterations: Int = 10000
   
   def calculate(numWorkers: Int, numSegments: Int) {
     val system = ActorSystem("MandelbrotSystem")
@@ -54,14 +54,13 @@ object Mandelbrot extends App {
   class Worker extends Actor {
     def calculateMandelbrotFor(start: Int, numYPixels: Int): mutable.Map[(Int, Int), Int] = {
       var mandelbrot: mutable.Map[(Int, Int), Int] = mutable.Map()
+      //val viewPort = ViewPort(canvasWidth, canvasHeight).zoom(.002).center(0.27, 0.005)
+      val viewPort = ViewPort(canvasWidth, canvasHeight)//.zoom(1.0).center(0, 0)
 
       for (px <- 0 until canvasWidth) {
 
         for (py <- start until start + numYPixels) {
-          // Convert the pixels to x, y co-ordinates in
-          // the range x = (-2.5, 1.0), y = (-1.0, 1.0)
-          val x0: Double = -2.5 + 3.5*(px.toDouble/canvasWidth.toDouble)
-          val y0: Double = -1 + 2*(py.toDouble/canvasHeight.toDouble)
+          val (x0, y0) = viewPort.translate(px, py)
 
           var x = 0.0
           var y = 0.0
@@ -91,7 +90,7 @@ object Mandelbrot extends App {
       case MandelbrotResult(elements, duration) =>
         println("completed in %s!".format(duration))
         context.system.shutdown()
-        new MandelbrotDisplay(elements, canvasHeight, canvasWidth, maxIterations)
+        new Display(elements.toMap, canvasHeight, canvasWidth, maxIterations)
     }
   }
 }
