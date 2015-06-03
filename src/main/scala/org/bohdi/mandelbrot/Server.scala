@@ -54,8 +54,8 @@ object Server extends App {
   class Worker extends Actor {
     def calculateMandelbrotFor(start: Int, numYPixels: Int): mutable.Map[(Int, Int), Int] = {
       var mandelbrot: mutable.Map[(Int, Int), Int] = mutable.Map()
-      //val viewPort = ViewPort(canvasWidth, canvasHeight).zoom(.002).center(0.27, 0.005)
-      val viewPort = ViewPort(canvasWidth, canvasHeight)//.zoom(1.0).center(0, 0)
+      val viewPort = ViewPort(canvasWidth, canvasHeight).zoom(.00005).center(0.27, 0.0055)
+      //val viewPort = ViewPort(canvasWidth, canvasHeight)//.zoom(1.0).center(0, 0)
 
       for (px <- 0 until canvasWidth) {
 
