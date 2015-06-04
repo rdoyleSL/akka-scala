@@ -7,6 +7,12 @@ import scala.collection.mutable
 import scala.concurrent.duration._
 
 object Server extends App {
+  val canvasWidth: Int = 1000
+  val canvasHeight: Int = 800
+  val maxIterations: Int = 10000
+
+  val display = new Display(canvasHeight, canvasWidth, new CyclePallete)
+
   calculate(numWorkers = 4, numSegments = 10)
   
   sealed trait MandelbrotMessage
@@ -15,9 +21,7 @@ object Server extends App {
   case class Result(elements: mutable.Map[(Int, Int), Int]) extends MandelbrotMessage
   case class MandelbrotResult(elements: mutable.Map[(Int, Int), Int], duration: Duration) extends MandelbrotMessage
 
-  val canvasWidth: Int = 1000
-  val canvasHeight: Int = 800
-  val maxIterations: Int = 10000
+
   
   def calculate(numWorkers: Int, numSegments: Int) {
     val system = ActorSystem("MandelbrotSystem")
@@ -89,8 +93,7 @@ object Server extends App {
     def receive = {
       case MandelbrotResult(elements, duration) =>
         println("completed in %s!".format(duration))
-        context.system.shutdown()
-        new Display(elements.toMap, canvasHeight, canvasWidth, maxIterations)
+        display.setPoints(elements.toMap)
     }
   }
 }

@@ -7,28 +7,33 @@ object Display {
 
 }
 
-class Display(points: Map[(Int, Int), Int], height: Int, width: Int, maxIterations: Int) extends JFrame {
-
-  setContentPane(new MandelbrotePanel(points, height, width, maxIterations))
+class Display(height: Int, width: Int, pallete: Pallete) extends JFrame {
+  val panel = new MandelbrotePanel(height, width, pallete)
+  setContentPane(panel)
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
   setSize(new Dimension(width, height))
   setVisible(true)
+
+  def setPoints(points: Map[(Int, Int), Int]) = panel.setPoints(points)
 }
 
-class MandelbrotePanel(points: Map[(Int, Int), Int], height: Int, width: Int, maxIterations: Int) extends JPanel {
+class MandelbrotePanel(height: Int, width: Int, pallete: Pallete) extends JPanel {
+  private var points: Map[(Int, Int), Int] = Map()
+
+  def setPoints(xpoints: Map[(Int, Int), Int]): Unit = {
+    points = xpoints
+    repaint()
+  }
 
   override def paintComponent(g: Graphics) {
     println(s"About to draw")
 
-    val pallete1 = PalleteFactory.cyclePallete
 
-    for (px <- 0 until width) {
-      for (py <- 0 until height) {
-        val numIters = points(px, py)
-        g.setColor(pallete1(numIters))
-        g.drawLine(px, py, px, py)
-      }
+    for (((px,py), iterations) <- points) {
+      g.setColor(pallete(iterations))
+      g.drawLine(px, py, px, py)
     }
+
     println(s"done to draw")
   }
 
