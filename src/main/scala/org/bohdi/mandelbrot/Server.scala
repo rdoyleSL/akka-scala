@@ -13,6 +13,7 @@ object Server extends App {
 
   val display = new Display(canvasHeight, canvasWidth, new CyclePallete)
 
+
   calculate(numWorkers = 4, numSegments = 10)
   
   sealed trait MandelbrotMessage
@@ -27,7 +28,16 @@ object Server extends App {
     val system = ActorSystem("MandelbrotSystem")
     val resultHandler = system.actorOf(Props[ResultHandler], name = "resultHandler")
     val master = system.actorOf(Props(new Master(numWorkers, numSegments, resultHandler)), name = "master")
+    val frameActor = system.actorOf(Props[FrameActor].withDispatcher("swing-dispatcher"), "frame-actor")
+
     master ! Calculate
+  }
+
+  class FrameActor extends Actor {
+    def receive = {
+      case _ => println("FrameActor")
+    }
+
   }
 
   class Master(numWorkers: Int, numSegments: Int, resultHandler: ActorRef) extends Actor {
