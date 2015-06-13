@@ -5,7 +5,7 @@ import akka.routing.{Broadcast, RoundRobinPool}
 
 
 object Main extends App {
-  val environment = Environment(1000, 800, 1000, 1, 4)
+  val environment = Environment(1000, 800, 1000, 8, 80)
 
   val system = ActorSystem("MandelbrotSystem")
 

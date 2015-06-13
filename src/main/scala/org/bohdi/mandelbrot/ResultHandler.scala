@@ -12,8 +12,7 @@ class ResultHandler extends Actor {
 
 
 def active(display: Display): Actor.Receive = {
-    case MandelbrotResult(elements, duration) =>
-      println("completed in %s!".format(duration))
-      display.setPoints(elements.toMap)
+    case MandelbrotResult(elements) =>
+      display.setPoints(elements)
   }
 }
