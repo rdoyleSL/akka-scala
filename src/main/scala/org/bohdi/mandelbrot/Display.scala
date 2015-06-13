@@ -7,17 +7,17 @@ object Display {
 
 }
 
-class Display(height: Int, width: Int, pallete: Pallete) extends JFrame {
-  val panel = new MandelbrotePanel(height, width, pallete)
+class Display(env: Environment, pallete: Pallete) extends JFrame {
+  val panel = new MandelbrotePanel(env, pallete)
   setContentPane(panel)
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-  setSize(new Dimension(width, height))
+  setSize(new Dimension(env.width, env.height))
   setVisible(true)
 
   def setPoints(points: Map[(Int, Int), Int]) = panel.setPoints(points)
 }
 
-class MandelbrotePanel(height: Int, width: Int, pallete: Pallete) extends JPanel {
+class MandelbrotePanel(env: Environment, pallete: Pallete) extends JPanel {
   private var points: Map[(Int, Int), Int] = Map()
 
   def setPoints(xpoints: Map[(Int, Int), Int]): Unit = {
