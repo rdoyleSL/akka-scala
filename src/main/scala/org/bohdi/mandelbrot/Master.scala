@@ -1,7 +1,6 @@
 package org.bohdi.mandelbrot
 
-import akka.actor.{Props, Actor, ActorRef}
-import akka.routing.RoundRobinPool
+import akka.actor.{Actor, ActorRef}
 import scala.concurrent.duration._
 
 import scala.collection.mutable
@@ -11,7 +10,6 @@ class Master extends Actor {
   var numResults: Int = 0
   val start: Long = System.currentTimeMillis()
 
-  //val workerRouter = context.actorOf(RoundRobinPool(env.workers).props(Props[Worker], "workerRouter")
 
 
   def receive = {
@@ -22,7 +20,7 @@ class Master extends Actor {
 
 
   def active(env: Environment, workers: ActorRef, resultHandler: ActorRef): Actor.Receive = {
-    case Calculate =>
+    case Calculate(zoom: Double, x: Double, y: Double) =>
       println("Calculating....")
       val pixelsPerSegment = env.height/env.segments
       for (i <- 0 until env.segments)
@@ -39,5 +37,7 @@ class Master extends Actor {
         resultHandler ! MandelbrotResult(mandelbrot, duration)
         context.stop(self)
       }
+
+    case x:Any => println(s"Master got junk: $x")
   }
 }

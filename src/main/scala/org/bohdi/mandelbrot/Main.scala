@@ -9,6 +9,7 @@ object Main extends App {
 
   val system = ActorSystem("MandelbrotSystem")
 
+  val viewPort = ViewPort(environment.width, environment.height)//.zoom(1.0).center(0, 0)
   val display = new Display(environment, new CyclePallete)
 
   val resultHandler = system.actorOf(Props[ResultHandler], "resultHandler")
@@ -20,5 +21,8 @@ object Main extends App {
   workers ! Broadcast(environment)
   master ! MasterInit(environment, workers, resultHandler)
 
-  master ! Calculate
+
+
+  println("Main sending calculate")
+  master ! Calculate(0, 0, 0)
 }
