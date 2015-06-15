@@ -5,35 +5,32 @@ import akka.actor.{Actor, ActorRef}
 
 class Master extends Actor {
   var mandelbrot: List[(Int, Int, Int)] = List()
-  var numResults: Int = 0
   val start: Long = System.currentTimeMillis()
 
 
 
   def receive = {
-    case init: MasterInit =>
-      println(s"Master received init: $init")
-      context.become(active(init.env, init.workers, init.resultHandler))
+    case (environment: Environment, workers: ActorRef, guiActor: ActorRef) =>
+      context.become(active(environment, workers, guiActor))
   }
 
 
-  def active(env: Environment, workers: ActorRef, resultHandler: ActorRef): Actor.Receive = {
-    case Calculate(zoom: Double, x: Double, y: Double) =>
+  def active(env: Environment, workers: ActorRef, guiActor: ActorRef): Actor.Receive = {
+
+    case Calculate(viewPort: ViewPort) =>
       println("Calculating....")
+      guiActor ! Clear
       val pixelsPerSegment = env.height/env.segments
       for (i <- 0 until env.segments)
-        workers ! Work(i * pixelsPerSegment, pixelsPerSegment)
+        workers ! Work(i * pixelsPerSegment, pixelsPerSegment, viewPort)
 
     case Result(elements) =>
-      //mandelbrot ++= elements
-      numResults += 1
-      //println(s"Master got some results: $numResults")
-
-      //if (numResults == env.segments) {
-        //println("master sending results to handler")
-        resultHandler ! MandelbrotResult(elements)
+      guiActor ! MandelbrotResult(elements)
         //context.stop(self)
       //}
+
+    case Clear =>
+      guiActor ! Clear
 
     case x:Any => println(s"Master got junk: $x")
   }

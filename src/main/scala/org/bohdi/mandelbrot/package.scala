@@ -8,11 +8,12 @@ import scala.concurrent.duration.Duration
 package object mandelbrot {
 
   sealed trait MandelbrotMessage
-  case class Calculate(zoom: Double, x: Double, y: Double) extends MandelbrotMessage
-  case class Work(start: Int, numYPixels: Int) extends MandelbrotMessage
+  case object Clear extends MandelbrotMessage
+  case class Calculate(viewPort: ViewPort) extends MandelbrotMessage
+  case class Work(start: Int, numYPixels: Int, viewPort: ViewPort ) extends MandelbrotMessage
   case class Result(elements: List[(Int, Int, Int)]) extends MandelbrotMessage
   case class MandelbrotResult(elements: List[(Int, Int, Int)]) extends MandelbrotMessage
-  case class MasterInit(env: Environment, workers: ActorRef, resultHandler: ActorRef)
+  case class MasterInit(env: Environment, workers: ActorRef, guiActor: ActorRef)
 
   case class Environment(width: Int,
                          height: Int,
