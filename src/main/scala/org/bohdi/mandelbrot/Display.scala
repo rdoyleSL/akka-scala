@@ -16,22 +16,35 @@ class Display(env: Environment, pallete: Pallete) extends FlowPanel {
 
 class MandelbrotePanel(env: Environment, pallete: Pallete) extends FlowPanel {
   private var points: List[(Int, Int, Color)] = List()
+  private var dirty: List[(Int, Int, Color)] = List()
+
 
   preferredSize = new Dimension(env.width, env.height)
 
   def clear() = {
     println(s"Panel clear")
     points = List()
+    dirty = List()
   }
 
   def setPoints(xpoints: List[(Int, Int, Color)]): Unit = {
     println(s"Panel setPoints")
     points = points ++ xpoints
+    dirty = dirty ++ xpoints
     repaint()
     revalidate()
   }
 
   override def paintComponent(g: Graphics2D) {
+    if (dirty.isEmpty)
+      paintPoints(g, points)
+    else {
+      paintPoints(g, dirty)
+      dirty = List()
+    }
+  }
+
+  def paintPoints(g: Graphics2D, points: List[(Int, Int, Color)]) {
     println(s"painting: ${points.size}")
     for ((px,py, color) <- points) {
       g.setColor(color)

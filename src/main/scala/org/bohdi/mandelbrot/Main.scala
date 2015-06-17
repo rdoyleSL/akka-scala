@@ -5,7 +5,7 @@ import akka.routing.{Broadcast, RoundRobinPool}
 import swing._
 
 object Main extends SimpleSwingApplication {
-  val environment = Environment(1000, 800, 1000, 8, 80)
+  val environment = Environment(1000, 800, 1000, 8, 20)
 
   val system = ActorSystem("MandelbrotSystem")
 
