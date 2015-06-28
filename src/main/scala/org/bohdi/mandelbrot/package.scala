@@ -10,7 +10,7 @@ package object mandelbrot {
   sealed trait MandelbrotMessage
   case object Clear extends MandelbrotMessage
   case class Calculate(viewPort: ViewPort) extends MandelbrotMessage
-  case class Work(start: Int, numYPixels: Int, viewPort: ViewPort ) extends MandelbrotMessage
+  case class Work(tile: Tile, viewPort: ViewPort ) extends MandelbrotMessage
   case class Result(elements: List[(Int, Int, Int)]) extends MandelbrotMessage
   case class MandelbrotResult(elements: List[(Int, Int, Int)]) extends MandelbrotMessage
   case class MasterInit(env: Environment, workers: ActorRef, guiActor: ActorRef)
@@ -19,6 +19,6 @@ package object mandelbrot {
                          height: Int,
                          maxIterations: Int,
                          workers: Int,
-                         segments: Int)
+                         tiles: Seq[Tile])
 
 }

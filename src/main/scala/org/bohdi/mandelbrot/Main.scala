@@ -5,7 +5,7 @@ import akka.routing.{Broadcast, RoundRobinPool}
 import swing._
 
 object Main extends SimpleSwingApplication {
-  val environment = Environment(1000, 800, 1000, 8, 20)
+  val environment = Environment(1000, 800, 1000, 8, TileFactory.create(1000, 800, 10))
 
   val system = ActorSystem("MandelbrotSystem")
 
@@ -22,12 +22,6 @@ object Main extends SimpleSwingApplication {
   master ! (environment, workers, guiActor)
 
 
-
-  println("Main sending calculate")
-  master ! Calculate(viewPort)
-  master ! Clear
-  master ! Calculate(viewPort.zoom(.00005).center(0.27, 0.0054))
-
   def top = new MainFrame {
 
     title = "Mandelbrot"
@@ -40,5 +34,10 @@ object Main extends SimpleSwingApplication {
     //override def size = new Dimension(1000,800)
 
   }
+
+  println("Main sending calculate")
+  master ! Calculate(viewPort)
+  master ! Clear
+  master ! Calculate(viewPort.zoom(.00005).center(0.27, 0.0054))
 
 }

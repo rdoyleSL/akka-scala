@@ -28,7 +28,7 @@ class MandelbrotePanel(env: Environment, pallete: Pallete) extends FlowPanel {
   }
 
   def setPoints(xpoints: List[(Int, Int, Color)]): Unit = {
-    println(s"Panel setPoints")
+    //println(s"Panel setPoints")
     points = points ++ xpoints
     dirty = dirty ++ xpoints
     repaint()
@@ -45,7 +45,7 @@ class MandelbrotePanel(env: Environment, pallete: Pallete) extends FlowPanel {
   }
 
   def paintPoints(g: Graphics2D, points: List[(Int, Int, Color)]) {
-    println(s"painting: ${points.size}")
+    //println(s"painting: ${points.size}")
     for ((px,py, color) <- points) {
       g.setColor(color)
       g.drawLine(px, py, px, py)

@@ -13,17 +13,17 @@ class Worker() extends Actor {
   }
 
   def active(env: Environment): Actor.Receive = {
-    case Work(start, numYPixels, viewPort) =>
-
-      sender ! Result(calculateMandelbrotFor(env, start, numYPixels, viewPort))
+    case Work(tile, viewPort) =>
+      println(s"Worker was asked to work on $tile")
+      sender ! Result(calculateMandelbrotFor(tile, env, viewPort))
   }
 
-    def calculateMandelbrotFor(env: Environment, start: Int, numYPixels: Int, viewPort: ViewPort): List[(Int, Int, Int)] = {
+    def calculateMandelbrotFor(tile: Tile, env: Environment, viewPort: ViewPort): List[(Int, Int, Int)] = {
       var mandelbrot: List[(Int, Int, Int)] = List()
 
-      for (px <- 0 until env.width) {
+      for (px <- tile.x until tile.x + tile.width) {
 
-        for (py <- start until start + numYPixels) {
+        for (py <- tile.y until tile.y + tile.height) {
           val (x0, y0) = viewPort.translate(px, py)
 
           var x = 0.0

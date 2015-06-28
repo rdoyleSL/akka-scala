@@ -20,9 +20,10 @@ class Master extends Actor {
     case Calculate(viewPort: ViewPort) =>
       println("Calculating....")
       guiActor ! Clear
-      val pixelsPerSegment = env.height/env.segments
-      for (i <- 0 until env.segments)
-        workers ! Work(i * pixelsPerSegment, pixelsPerSegment, viewPort)
+
+      for (tile <- env.tiles) {
+        workers ! Work(tile, viewPort)
+      }
 
     case Result(elements) =>
       guiActor ! MandelbrotResult(elements)
