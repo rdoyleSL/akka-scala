@@ -9,9 +9,9 @@ object Main extends SimpleSwingApplication {
 
   val system = ActorSystem("MandelbrotSystem")
 
-  val viewPort = ViewPort(environment.width, environment.height)//.zoom(1.0).center(0, 0)
+  val viewPort = ViewPort(environment.width, environment.height).center(0.27, 0.0054)
   val display = new Display(environment, new CyclePallete)
-  display.visible = true
+  //display.visible = true
 
   val workers = system.actorOf(RoundRobinPool(environment.workers).props(Props[Worker]), "workerRouter")
   val master = system.actorOf(Props[Master], "master")
@@ -21,23 +21,27 @@ object Main extends SimpleSwingApplication {
   workers ! Broadcast(environment)
   master ! (environment, workers, guiActor)
 
-
   def top = new MainFrame {
+    title = "Mandlebrot"
+    minimumSize = new Dimension(500, 500)
 
-    title = "Mandelbrot"
-    minimumSize = new Dimension(500,500)
-
-    contents = new FlowPanel {
-      contents += display
-      contents += new Button("Press Me")
-    }
-    //override def size = new Dimension(1000,800)
-
+    contents = display
   }
+
+
 
   println("Main sending calculate")
   master ! Calculate(viewPort)
-  master ! Clear
+  master ! Calculate(viewPort.zoom(.5).center(0.27, 0.0054))
+  w
+  master ! Calculate(viewPort.zoom(.05).center(0.27, 0.0054))
+  w
+  master ! Calculate(viewPort.zoom(.005).center(0.27, 0.0054))
+  w
+  master ! Calculate(viewPort.zoom(.0005).center(0.27, 0.0054))
+  w
   master ! Calculate(viewPort.zoom(.00005).center(0.27, 0.0054))
+
+  def w = Thread.sleep(1000)
 
 }

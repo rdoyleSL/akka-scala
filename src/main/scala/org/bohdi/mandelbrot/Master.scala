@@ -25,8 +25,8 @@ class Master extends Actor {
         workers ! Work(tile, viewPort)
       }
 
-    case Result(elements) =>
-      guiActor ! MandelbrotResult(elements)
+    case Result(tile, elements) =>
+      guiActor ! MandelbrotResult(tile, elements)
         //context.stop(self)
       //}
 

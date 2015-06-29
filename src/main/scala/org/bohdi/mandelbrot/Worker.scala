@@ -14,8 +14,8 @@ class Worker() extends Actor {
 
   def active(env: Environment): Actor.Receive = {
     case Work(tile, viewPort) =>
-      println(s"Worker was asked to work on $tile")
-      sender ! Result(calculateMandelbrotFor(tile, env, viewPort))
+      //println(s"Worker was asked to work on $tile")
+      sender ! Result(tile, calculateMandelbrotFor(tile, env, viewPort))
   }
 
     def calculateMandelbrotFor(tile: Tile, env: Environment, viewPort: ViewPort): List[(Int, Int, Int)] = {

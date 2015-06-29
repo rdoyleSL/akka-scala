@@ -11,8 +11,8 @@ package object mandelbrot {
   case object Clear extends MandelbrotMessage
   case class Calculate(viewPort: ViewPort) extends MandelbrotMessage
   case class Work(tile: Tile, viewPort: ViewPort ) extends MandelbrotMessage
-  case class Result(elements: List[(Int, Int, Int)]) extends MandelbrotMessage
-  case class MandelbrotResult(elements: List[(Int, Int, Int)]) extends MandelbrotMessage
+  case class Result(tile: Tile, elements: List[(Int, Int, Int)]) extends MandelbrotMessage
+  case class MandelbrotResult(tile: Tile, elements: List[(Int, Int, Int)]) extends MandelbrotMessage
   case class MasterInit(env: Environment, workers: ActorRef, guiActor: ActorRef)
 
   case class Environment(width: Int,
