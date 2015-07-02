@@ -6,8 +6,9 @@ import akka.routing.{Broadcast, RoundRobinPool}
 
 class ModelActor extends Actor {
   var mandelbrot: List[(Int, Int, Int)] = List()
-  val start: Long = System.currentTimeMillis()
-
+  //val start: Long = System.currentTimeMillis()
+  var viewPort = ViewPort().center(0.27, 0.0054)
+  var job = 1
 
 
   def receive = {
@@ -21,22 +22,60 @@ class ModelActor extends Actor {
 
   def active(env: Environment, workers: ActorRef, guiActor: ActorRef): Actor.Receive = {
 
-    case Calculate(viewPort: ViewPort) =>
-      println("Calculating....")
-      //guiActor ! Clear
+    case Show =>
+      println("Show...")
+      calculate(env, workers)
 
-      for (tile <- env.tiles) {
-        workers ! Work(tile, viewPort)
+    case ZoomIn =>
+      viewPort = viewPort.zoom(0.7)
+      calculate(env, workers)
+
+    case ZoomIn100 =>
+      println("m 100")
+      (0 to 20) foreach {n: Int =>
+        println("z " + n)
+        viewPort = viewPort.zoom(0.7)
+        calculate(env, workers)
       }
 
-    case Result(tile, elements) =>
-      guiActor ! MandelbrotResult(tile, elements)
+    case ZoomOut =>
+      viewPort = viewPort.zoom(1/0.7)
+      calculate(env, workers)
+
+    case PanLeft =>
+      viewPort = viewPort.panLeft
+      calculate(env, workers)
+
+    case PanRight =>
+      viewPort = viewPort.panRight
+      calculate(env, workers)
+
+    case PanUp =>
+      viewPort = viewPort.panUp
+      calculate(env, workers)
+
+    case PanDown =>
+      viewPort = viewPort.panDown
+      calculate(env, workers)
+
+
+    case Result(job, tile, elements) =>
+      if (this.job == job) {
+        println("Got " + job)
+        guiActor ! MandelbrotResult(job, tile, elements)
+      }
         //context.stop(self)
       //}
 
-    case Clear =>
-      guiActor ! Clear
-
     case x:Any => println(s"Master got junk: $x")
+  }
+
+  def calculate(env: Environment, workers: ActorRef) = {
+    job = job + 1
+    println("Submit " + job)
+
+    for (tile <- env.tiles) {
+      workers ! Work(job, tile, viewPort)
+    }
   }
 }

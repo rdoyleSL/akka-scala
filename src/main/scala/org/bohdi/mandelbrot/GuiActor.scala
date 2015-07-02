@@ -10,10 +10,9 @@ class GuiActor extends Actor {
 
   def active(display: Display): Actor.Receive = {
 
-    case MandelbrotResult(tile, elements) =>
+    case MandelbrotResult(job: Int, tile, elements) =>
       //println(s"GUI Actor got results: ${elements.size}")
-      display.setPoints(tile, elements)
+      display.setPoints(job, tile, elements)
 
-    case Clear => display.clear
   }
 }
