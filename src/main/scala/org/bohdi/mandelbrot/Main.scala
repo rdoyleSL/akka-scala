@@ -13,13 +13,13 @@ object Main extends SimpleSwingApplication {
   val display = new Display(environment, new CyclePallete)
   //display.visible = true
 
-  val workers = system.actorOf(RoundRobinPool(environment.workers).props(Props[Worker]), "workerRouter")
-  val master = system.actorOf(Props[Master], "master")
+  //val workers = system.actorOf(RoundRobinPool(environment.workers).props(Props[Worker]), "workerRouter")
+  val model = system.actorOf(Props[ModelActor], "master")
   val guiActor = system.actorOf(Props[GuiActor].withDispatcher("swing-dispatcher"), "frame-actor")
 
   guiActor ! display
-  workers ! Broadcast(environment)
-  master ! (environment, workers, guiActor)
+  //workers ! Broadcast(environment)
+  model ! (environment, guiActor)
 
   def top = new MainFrame {
     title = "Mandlebrot"
@@ -31,17 +31,19 @@ object Main extends SimpleSwingApplication {
 
 
   println("Main sending calculate")
-  master ! Calculate(viewPort)
-  master ! Calculate(viewPort.zoom(.5).center(0.27, 0.0054))
-  w
-  master ! Calculate(viewPort.zoom(.05).center(0.27, 0.0054))
-  w
-  master ! Calculate(viewPort.zoom(.005).center(0.27, 0.0054))
-  w
-  master ! Calculate(viewPort.zoom(.0005).center(0.27, 0.0054))
-  w
-  master ! Calculate(viewPort.zoom(.00005).center(0.27, 0.0054))
+  model ! Calculate(viewPort)
 
-  def w = Thread.sleep(1000)
+  model ! Calculate(viewPort.zoom(.5).center(0.27, 0.0054))
+  w
+  model ! Calculate(viewPort.zoom(.05).center(0.27, 0.0054))
+  w
+  model ! Calculate(viewPort.zoom(.005).center(0.27, 0.0054))
+
+  w
+  model ! Calculate(viewPort.zoom(.0005).center(0.27, 0.0054))
+  w
+  model ! Calculate(viewPort.zoom(.00005).center(0.27, 0.0054))
+
+  def w: Unit = Thread.sleep(1000)
 
 }

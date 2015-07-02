@@ -1,16 +1,20 @@
 package org.bohdi.mandelbrot
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Props, Actor, ActorRef}
+import akka.routing.{Broadcast, RoundRobinPool}
 
 
-class Master extends Actor {
+class ModelActor extends Actor {
   var mandelbrot: List[(Int, Int, Int)] = List()
   val start: Long = System.currentTimeMillis()
 
 
 
   def receive = {
-    case (environment: Environment, workers: ActorRef, guiActor: ActorRef) =>
+    case (environment: Environment, guiActor: ActorRef) =>
+      val workers = context.actorOf(RoundRobinPool(environment.workers).props(Props[Worker]), "workerRouter")
+      workers ! Broadcast(environment)
+
       context.become(active(environment, workers, guiActor))
   }
 
@@ -19,7 +23,7 @@ class Master extends Actor {
 
     case Calculate(viewPort: ViewPort) =>
       println("Calculating....")
-      guiActor ! Clear
+      //guiActor ! Clear
 
       for (tile <- env.tiles) {
         workers ! Work(tile, viewPort)
