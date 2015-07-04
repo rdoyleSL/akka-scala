@@ -2,7 +2,6 @@
 package org.bohdi.mandelbrot
 
 object TileFactory {
-  //def apply(x: Int, width: Int, y: Int, height: Int) =  new Tile(id, x, y, width, height)
 
   def generate(size: Int, chunk: Int): Seq[(Int, Int)] = {
 

@@ -4,10 +4,10 @@ import akka.actor.{Props, Actor, ActorRef}
 import akka.routing.{Broadcast, RoundRobinPool}
 
 
-class ModelActor extends Actor {
+class Model extends Actor {
   var mandelbrot: List[(Int, Int, Int)] = List()
-  //val start: Long = System.currentTimeMillis()
   var viewPort = ViewPort().center(0.27, 0.0054)
+  var pallete: Pallete = new OddEvenPallete
   var job = 1
 
 
@@ -22,8 +22,7 @@ class ModelActor extends Actor {
 
   def active(env: Environment, workers: ActorRef, guiActor: ActorRef): Actor.Receive = {
 
-    case Show =>
-      println("Show...")
+    case Start =>
       calculate(env, workers)
 
     case ZoomIn =>
@@ -31,7 +30,6 @@ class ModelActor extends Actor {
       calculate(env, workers)
 
     case ZoomIn100 =>
-      println("m 100")
       (0 to 20) foreach {n: Int =>
         println("z " + n)
         viewPort = viewPort.zoom(0.7)
@@ -58,24 +56,28 @@ class ModelActor extends Actor {
       viewPort = viewPort.panDown
       calculate(env, workers)
 
+    case ChangePallete(newPallete) =>
+      pallete = newPallete
+      calculate(env, workers)
+
 
     case Result(job, tile, elements) =>
       if (this.job == job) {
-        println("Got " + job)
         guiActor ! MandelbrotResult(job, tile, elements)
       }
         //context.stop(self)
       //}
 
-    case x:Any => println(s"Master got junk: $x")
+    case x:Any => println(s"Model got junk: $x")
   }
 
   def calculate(env: Environment, workers: ActorRef) = {
     job = job + 1
-    println("Submit " + job)
+
+    workers ! Broadcast(job)
 
     for (tile <- env.tiles) {
-      workers ! Work(job, tile, viewPort)
+      workers ! Work(job, tile, viewPort, pallete)
     }
   }
 }

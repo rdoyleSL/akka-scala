@@ -25,9 +25,9 @@ case class ViewPort(centerX: Double = 0.0,
     copy(centerX = x, centerY = y)
   }
 
-  def panLeft = center(centerX + width/10, centerY)
-  def panRight = center(centerX - width/10, centerY)
-  def panUp = center(centerX, centerY + height/10)
-  def panDown = center(centerX, centerY - height/10)
+  def panLeft = center(centerX - width/10, centerY)
+  def panRight = center(centerX + width/10, centerY)
+  def panUp = center(centerX, centerY - height/10)
+  def panDown = center(centerX, centerY + height/10)
 
 }
