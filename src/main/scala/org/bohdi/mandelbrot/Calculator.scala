@@ -4,15 +4,15 @@ import java.awt.Color
 
 import akka.actor.Actor
 
-class Worker() extends Actor {
+class Calculator() extends Actor {
   var myjob = 0
 
   def receive = {
-    case env: Environment =>
-      context.become(active(env))
+    case settings: Settings =>
+      context.become(active(settings))
   }
 
-  def active(env: Environment): Actor.Receive = {
+  def active(settings: Settings): Actor.Receive = {
 
     case job: Int =>
       println(s"Waiting for $job")
@@ -21,10 +21,10 @@ class Worker() extends Actor {
     case Work(job, tile, viewPort, pallete) =>
       //println(s"Checking if ${myjob} == $job => ${myjob == job}")
       if (myjob == job)
-        sender ! Result(job, tile, calculateMandelbrotFor(tile, env, viewPort, pallete))
+        sender ! Result(job, tile, calculateMandelbrotFor(tile, settings, viewPort, pallete))
   }
 
-  def calculateMandelbrotFor(tile: Tile, env: Environment, viewPort: ViewPort, pallete: Pallete): List[(Int, Int, Color)] = {
+  def calculateMandelbrotFor(tile: Tile, settings: Settings, viewPort: ViewPort, pallete: Pallete): List[(Int, Int, Color)] = {
     var mandelbrot: List[(Int, Int, Color)] = List()
 
     for (px <- tile.x until tile.x + tile.width) {
@@ -36,7 +36,7 @@ class Worker() extends Actor {
         var y = 0.0
         var iteration = 0
 
-        while (x * x + y * y < 4 && iteration < env.maxIterations) {
+        while (x * x + y * y < 4 && iteration < settings.maxIterations) {
           val xTemp = x * x - y * y + x0
           y = 2 * x * y + y0
           x = xTemp

@@ -9,56 +9,60 @@ class Model extends Actor {
   var viewPort = ViewPort().center(0.27, 0.0054)
   var pallete: Pallete = new OddEvenPallete
   var job = 1
+  var tiles = Seq[Tile]()
 
 
   def receive = {
-    case (environment: Environment, guiActor: ActorRef) =>
-      val workers = context.actorOf(RoundRobinPool(environment.workers).props(Props[Worker]), "workerRouter")
-      workers ! Broadcast(environment)
+    case (settings: Settings, guiActor: ActorRef) =>
+      val workers = context.actorOf(RoundRobinPool(settings.workers).props(Props[Calculator]), "workerRouter")
+      workers ! Broadcast(settings)
 
-      context.become(active(environment, workers, guiActor))
+      tiles = TileFactory.create(settings.width, settings.height, settings.workers)
+
+
+      context.become(active(settings, tiles, workers, guiActor))
   }
 
 
-  def active(env: Environment, workers: ActorRef, guiActor: ActorRef): Actor.Receive = {
+  def active(settings: Settings, tile: Seq[Tile], workers: ActorRef, guiActor: ActorRef): Actor.Receive = {
 
     case Start =>
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case ZoomIn =>
       viewPort = viewPort.zoom(0.7)
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case ZoomIn100 =>
       (0 to 20) foreach {n: Int =>
         println("z " + n)
         viewPort = viewPort.zoom(0.7)
-        calculate(env, workers)
+        calculate(settings, workers)
       }
 
     case ZoomOut =>
       viewPort = viewPort.zoom(1/0.7)
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case PanLeft =>
       viewPort = viewPort.panLeft
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case PanRight =>
       viewPort = viewPort.panRight
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case PanUp =>
       viewPort = viewPort.panUp
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case PanDown =>
       viewPort = viewPort.panDown
-      calculate(env, workers)
+      calculate(settings, workers)
 
     case ChangePallete(newPallete) =>
       pallete = newPallete
-      calculate(env, workers)
+      calculate(settings, workers)
 
 
     case Result(job, tile, elements) =>
@@ -71,12 +75,12 @@ class Model extends Actor {
     case x:Any => println(s"Model got junk: $x")
   }
 
-  def calculate(env: Environment, workers: ActorRef) = {
+  def calculate(settings: Settings, workers: ActorRef) = {
     job = job + 1
 
     workers ! Broadcast(job)
 
-    for (tile <- env.tiles) {
+    for (tile <- tiles) {
       workers ! Work(job, tile, viewPort, pallete)
     }
   }

@@ -29,10 +29,6 @@ package object mandelbrot {
   case class MandelbrotResult(job: Int, tile: Tile, elements: List[(Int, Int, Color)]) extends Command
   case class MasterInit(env: Environment, workers: ActorRef, guiActor: ActorRef)
 
-  case class Environment(width: Int,
-                         height: Int,
-                         maxIterations: Int,
-                         workers: Int,
-                         tiles: Seq[Tile])
+  case class Environment(xtiles: Seq[Tile])
 
 }

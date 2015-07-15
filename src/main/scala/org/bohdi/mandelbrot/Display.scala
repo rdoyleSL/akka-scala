@@ -2,13 +2,17 @@ package org.bohdi.mandelbrot
 
 import java.awt.{Dimension, Color}
 import akka.actor.ActorRef
+import com.typesafe.config.Config
 
 import scala.swing.event.{KeyTyped, ButtonClicked}
 import swing._
 
-class Display(env: Environment, model: ActorRef) extends FlowPanel {
-  val panel1 = new MandelbrotePanel(env)
-  val panel2 = new MandelbrotePanel(env)
+class Display(settings: Settings, model: ActorRef) extends FlowPanel {
+
+  val panel1 = new MandelbrotePanel(settings)
+  val panel2 = new MandelbrotePanel(settings)
+  val panel3 = new MandelbrotePanel(settings)
+  val panel4 = new MandelbrotePanel(settings)
 
   val zoomIn = new Button("+")
   val zoomOut = new Button("-")
@@ -20,32 +24,28 @@ class Display(env: Environment, model: ActorRef) extends FlowPanel {
   val p1 = new Button("p1")
   val p2 = new Button("p2")
 
-
+  val controls = List(zoomIn, zoomOut, left, right, up, down, zoomIn100, p1, p2)
+  val keyedControls = List(zoomIn, zoomOut, left, right, up, down)
 
 
   contents += new BoxPanel(Orientation.Vertical) {
-    contents += new BoxPanel(Orientation.Horizontal) {
+    contents += new GridPanel(2,2) {
       contents += panel1
       contents += panel2
+      contents += panel3
+      contents += panel4
+
     }
 
     contents += new BoxPanel(Orientation.Horizontal) {
-      contents += zoomIn
-      contents += zoomOut
-      contents += left
-      contents += right
-      contents += up
-      contents += down
-      contents += zoomIn100
-      contents += p1
-      contents += p2
+      contents ++= controls
     }
   }
 
-  listenTo(zoomIn, zoomOut, left, right, up, down, zoomIn.keys, zoomOut.keys, left.keys, right.keys, up.keys, down.keys,
-    zoomIn100,
-    p1,
-    p2)
+  controls.foreach{b: Button => listenTo(b)}
+  keyedControls.foreach{b: Button => listenTo(b.keys)}
+
+  //listenTo(zoomIn.keys, zoomOut.keys, left.keys, right.keys, up.keys, down.keys)
 
   reactions += {
     case ButtonClicked(`zoomIn`) => model ! ZoomIn
@@ -56,9 +56,7 @@ class Display(env: Environment, model: ActorRef) extends FlowPanel {
     case ButtonClicked(`down`) => model ! PanDown
     case ButtonClicked(`zoomIn100`) => model ! ZoomIn100
     case ButtonClicked(`p1`) => model ! ChangePallete(new OddEvenPallete)
-    case ButtonClicked(`p2`) => model ! ChangePallete(new CyclePallete(env.maxIterations))
-
-
+    case ButtonClicked(`p2`) => model ! ChangePallete(new CyclePallete(settings.maxIterations))
 
     case KeyTyped(_, c, _, _) =>
       c match {
@@ -75,15 +73,17 @@ class Display(env: Environment, model: ActorRef) extends FlowPanel {
   def setPoints(job: Int, tile: Tile, points: List[(Int, Int, Color)]) = {
     panel1.setPoints(job, tile, points)
     panel2.setPoints(job, tile, points)
+    panel3.setPoints(job, tile, points)
+    panel4.setPoints(job, tile, points)
 
   }
 }
 
-class MandelbrotePanel(env: Environment) extends FlowPanel {
+class MandelbrotePanel(settings: Settings) extends FlowPanel {
   private var points: Map[Tile, List[(Int, Int, Color)]] = Map()
   private var dirty: Map[Tile, List[(Int, Int, Color)]] = Map()
 
-  preferredSize = new Dimension(env.width, env.height)
+  preferredSize = new Dimension(settings.height, settings.width)
 
   def setPoints(job: Int, tile: Tile, data: List[(Int, Int, Color)]): Unit = {
     points = points.updated(tile, data)

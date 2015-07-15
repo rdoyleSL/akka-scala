@@ -6,8 +6,8 @@ case class ViewPort(centerX: Double = 0.0,
                     height: Double = 5
                      ) {
 
-  val screenWidth = 1000.toDouble
-  val screenHeight = 800.toDouble
+  val screenWidth = 500.toDouble
+  val screenHeight = 400.toDouble
 
   def translate(x: Int, y: Int): (Double, Double) = {
     // Convert the pixels to x, y co-ordinates in
