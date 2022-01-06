@@ -2,7 +2,7 @@ package org.bohdi.mandelbrot
 
 import java.awt.Color
 
-import com.sun.xml.internal.bind.WhiteSpaceProcessor
+//import com.sun.xml.internal.bind.WhiteSpaceProcessor
 
 trait Pallete {
   def apply(n: Int): Color

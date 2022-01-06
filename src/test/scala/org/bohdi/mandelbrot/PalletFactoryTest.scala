@@ -10,7 +10,7 @@ class PalletFactoryTest extends FlatSpec with Matchers {
 
 
   it should "blagr" in {
-    val p = new CyclePallete()
+    val p = new CyclePallete(5)
 
     color(0, 1, 0) should equal(p(1))
     color(0, 100, 0) should equal(p(100))

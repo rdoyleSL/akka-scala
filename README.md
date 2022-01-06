@@ -8,4 +8,4 @@ calculate whether complex numbers lie in the [Mandelbrot Set](http://en.wikipedi
 Through delegating the computation for ranges of complex numbers to different actors, we can perform
 the calculations concurrently and decrease the time it takes to calculate the complete range of complex numbers.
 
-As of 2022 does not build. :-(
+As of 2022 it builds and displays for drawings. Other stuff?
